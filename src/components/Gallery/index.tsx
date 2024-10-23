@@ -6,11 +6,8 @@ import zoom from '../../assets/images/zoom.png'
 import close from '../../assets/images/fechar.png'
 import { Action, Item, Items, Modal, ModalContent } from './styles'
 import { useState } from 'react'
+import { GalleryItem } from '../../pages/Home'
 
-interface GalleryItem {
-  type: 'image' | 'video'
-  url: string
-}
 const mock: GalleryItem[] = [
   {
     type: 'image',

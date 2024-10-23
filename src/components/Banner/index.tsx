@@ -1,18 +1,34 @@
 import { Imagem, Titulo, Precos } from './styles'
-import bannerImg from '../../assets/images/sparkin-zero-banner.png'
 import Tag from '../Tag'
 import Button from '../Button'
 
+import { useEffect, useState } from 'react'
+import { Game } from '../../pages/Home'
+
+import { formataPreco } from '../ProductsList'
+
 const Banner = () => {
+  const [game, setGame] = useState<Game>()
+
+  useEffect(() => {
+    fetch('https://fake-api-tau.vercel.app/api/eplay/destaque').then((res) => {
+      return res.json().then((res) => setGame(res))
+    })
+  }, [])
+
+  if (!game) {
+    return <h1>Carregando</h1>
+  }
+
   return (
-    <Imagem style={{ backgroundImage: `url(${bannerImg})` }}>
+    <Imagem style={{ backgroundImage: `url(${game.media.cover})` }}>
       <div className="container">
         <Tag size="big">Destaque do dia</Tag>
         <div>
-          <Titulo>Dragon Ball Sparking Zero PS5 & PC</Titulo>
+          <Titulo>{game.name}</Titulo>
           <Precos>
-            De R$ <span>350,00</span> <br />
-            por apenas R$ 282,50
+            De R$ <span>{formataPreco(game.prices.old)}</span> <br />
+            por apenas {formataPreco(game.prices.current)}
           </Precos>
         </div>
         <Button

@@ -10,7 +10,7 @@ export const Banner = styled.div`
   width: 100%;
 
   background-repeat: no-repeat;
-  background-position: center bottom;
+  background-position: center;
   background-size: 100%;
   padding-top: 16px;
 

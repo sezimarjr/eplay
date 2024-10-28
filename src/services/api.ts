@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { Game } from '../pages/Home'
-import { get } from 'http'
 
 const api = createApi({
   baseQuery: fetchBaseQuery({

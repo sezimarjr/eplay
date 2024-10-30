@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import ProductsList from '../../components/ProductsList'
 import {
   useGetActionGamesQuery,
@@ -7,7 +6,6 @@ import {
   useGetSimulationGamesQuery,
   useGetSportGamesQuery
 } from '../../services/api'
-import { Game } from '../Home'
 
 const Categories = () => {
   const { data: actionGames } = useGetActionGamesQuery()

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { HashLink } from 'react-router-hash-link'
 import { RootReducer } from '../../store'
 import { useDispatch, useSelector } from 'react-redux'
 import { useState } from 'react'
@@ -43,13 +44,28 @@ const Header = () => {
           <nav>
             <Links>
               <LinkItem>
-                <Link to="/categories">Categorias</Link>
+                <Link
+                  title="Clique aqui para acessar a pagina de categorias"
+                  to="/categories"
+                >
+                  Categorias
+                </Link>
               </LinkItem>
               <LinkItem>
-                <a href="#coming-soon">Novidades</a>
+                <HashLink
+                  title="Clique aqui para acessar a seção de em breve"
+                  to="/#coming-soon"
+                >
+                  Em Breve
+                </HashLink>
               </LinkItem>
               <LinkItem>
-                <a href="#on-sale">Promoções</a>
+                <HashLink
+                  title="Clique aqui para acessar a seção de promoções"
+                  to="/#on-sale"
+                >
+                  Promoções
+                </HashLink>
               </LinkItem>
             </Links>
           </nav>
@@ -63,13 +79,31 @@ const Header = () => {
       <NavMobile className={openNav ? 'is-open' : ''}>
         <Links>
           <LinkItem>
-            <Link to="/categories">Categorias</Link>
+            <Link
+              title="Clique aqui para acessar a pagina de categorias"
+              to="/categories"
+              onClick={() => setOpenNav(false)}
+            >
+              Categorias
+            </Link>
           </LinkItem>
           <LinkItem>
-            <a href="#coming-soon">Novidades</a>
+            <HashLink
+              title="Clique aqui para acessar a seção de em breve"
+              to="/#coming-soon"
+              onClick={() => setOpenNav(false)}
+            >
+              Em Breve
+            </HashLink>
           </LinkItem>
           <LinkItem>
-            <a href="#on-sale">Promoções</a>
+            <HashLink
+              title="Clique aqui para acessar a seção de promoções"
+              to="/#on-sale"
+              onClick={() => setOpenNav(false)}
+            >
+              Promoções
+            </HashLink>
           </LinkItem>
         </Links>
       </NavMobile>

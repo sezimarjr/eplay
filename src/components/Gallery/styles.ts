@@ -18,11 +18,11 @@ export const Action = styled.div`
   justify-content: center;
   opacity: 0;
   transition: opacity 0.5s ease;
-  cursor: pointer;
 `
 
 export const Item = styled.li`
   position: relative;
+  cursor: zoom-in;
   > img {
     border: 2px solid ${cores.branca};
     border-radius: 8px;

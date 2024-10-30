@@ -8,7 +8,7 @@ import { useGetGameQuery } from '../../services/api'
 const Product = () => {
   const { id } = useParams()
 
-  const { data: game, isLoading } = useGetGameQuery(id!)
+  const { data: game } = useGetGameQuery(id!)
 
   if (!game) {
     return <h1>Carregando</h1>

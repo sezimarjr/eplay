@@ -36,7 +36,7 @@ const Home = () => {
 
   return (
     <>
-      {/* <Banner /> */}
+      <Banner />
       <ProductsList
         games={onSaleGames}
         title="Promoções"

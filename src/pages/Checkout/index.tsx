@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { RootReducer } from '../../store'
+import { Navigate } from 'react-router-dom'
+import InputMask from 'react-input-mask'
 import Button from '../../components/Button'
 import Card from '../../components/Card'
 
@@ -11,10 +13,9 @@ import creditCard from '../../assets/images/credit_card.png'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { usePurchaseMutation } from '../../services/api'
-import { Navigate } from 'react-router-dom'
 import { getTotalPrice } from '../../utils'
 import { formataPreco } from '../../components/ProductsList'
-
+import { clear } from '../../store/reducers/cart'
 type Installment = {
   quantity: number
   amount: number
@@ -22,10 +23,10 @@ type Installment = {
 }
 const Checkout = () => {
   const [payWithCard, setPayWithCard] = useState(false)
-  const [purchase, { isLoading, isError, data, isSuccess }] =
-    usePurchaseMutation()
+  const [purchase, { isLoading, data, isSuccess }] = usePurchaseMutation()
   const { items } = useSelector((state: RootReducer) => state.cart)
   const [installments, setInstallments] = useState<Installment[]>([])
+  const dispatch = useDispatch()
 
   const totalPrice = getTotalPrice(items)
 
@@ -40,8 +41,8 @@ const Checkout = () => {
       cardDisplayName: '',
       cardNumber: '',
       cpfCardOwner: '',
-      cardExpirationMonth: '',
-      cardExpirationYear: '',
+      expiresMonth: '',
+      expiresYear: '',
       cardCode: '',
       installments: 1
     },
@@ -75,16 +76,16 @@ const Checkout = () => {
       cpfCardOwner: Yup.string().when((values, schema) =>
         payWithCard ? schema.required('O campo é obrigatorio') : schema
       ),
-      cardExpirationMonth: Yup.string().when((values, schema) =>
+      expiresMonth: Yup.string().when((values, schema) =>
         payWithCard ? schema.required('O campo é obrigatorio') : schema
       ),
-      cardExpirationYear: Yup.string().when((values, schema) =>
+      expiresYear: Yup.string().when((values, schema) =>
         payWithCard ? schema.required('O campo é obrigatorio') : schema
       ),
       cardCode: Yup.string().when((values, schema) =>
         payWithCard ? schema.required('O campo é obrigatorio') : schema
       ),
-      installments: Yup.string().when((values, schema) =>
+      installments: Yup.number().when((values, schema) =>
         payWithCard ? schema.required('O campo é obrigatorio') : schema
       )
     }),
@@ -99,7 +100,7 @@ const Checkout = () => {
           email: values.deliveryEmail
         },
         payment: {
-          installments: 1,
+          installments: values.installments,
           card: {
             active: payWithCard,
             code: Number(values.cardCode),
@@ -110,17 +111,15 @@ const Checkout = () => {
               name: values.cardOwner
             },
             expires: {
-              month: 1,
-              year: 2024
+              month: Number(values.expiresMonth),
+              year: Number(values.expiresYear)
             }
           }
         },
-        products: [
-          {
-            id: 1,
-            price: 10
-          }
-        ]
+        products: items.map((item) => ({
+          id: item.id,
+          price: item.prices.current as number
+        }))
       })
     }
   })
@@ -150,13 +149,20 @@ const Checkout = () => {
     }
   }, [totalPrice])
 
-  if (items.length === 0) {
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(clear())
+    }
+  }, [isSuccess, dispatch])
+
+  if (items.length === 0 && isSuccess === false) {
+    console.log(isSuccess)
     return <Navigate to="/" />
   }
 
   return (
     <div className="container">
-      {isSuccess ? (
+      {isSuccess && data ? (
         <Card title="Muito Obrigado">
           <>
             <p>
@@ -220,7 +226,9 @@ const Checkout = () => {
                 </InputGroup>
                 <InputGroup>
                   <label htmlFor="cpf">CPF</label>
-                  <input
+                  <InputMask
+                    mask="999.999.999-99"
+                    maskChar=""
                     id="cpf"
                     type="text"
                     name="cpf"
@@ -307,7 +315,9 @@ const Checkout = () => {
                       </InputGroup>
                       <InputGroup>
                         <label htmlFor="cpfCardOwner">CPF titular cartão</label>
-                        <input
+                        <InputMask
+                          mask="999.999.999-99"
+                          maskChar=""
                           type="text"
                           id="cpfCardOwner"
                           name="cpfCardOwner"
@@ -337,7 +347,9 @@ const Checkout = () => {
                       </InputGroup>
                       <InputGroup>
                         <label htmlFor="cardNumber">Numero do cartão</label>
-                        <input
+                        <InputMask
+                          mask="9999 9999 9999 9999"
+                          maskChar=""
                           type="text"
                           id="cardNumber"
                           name="cardNumber"
@@ -351,11 +363,13 @@ const Checkout = () => {
                       </InputGroup>
                       <InputGroup maxWidth="123px">
                         <label htmlFor="expiresMonth">Mês do vencimento</label>
-                        <input
+                        <InputMask
+                          mask="99"
+                          maskChar=""
                           type="text"
                           id="expiresMonth"
                           name="expiresMonth"
-                          value={form.values.cardExpirationMonth}
+                          value={form.values.expiresMonth}
                           onChange={form.handleChange}
                           onBlur={form.handleBlur}
                           className={
@@ -365,11 +379,13 @@ const Checkout = () => {
                       </InputGroup>
                       <InputGroup maxWidth="123px">
                         <label htmlFor="expiresYear">Ano do vencimento</label>
-                        <input
+                        <InputMask
+                          mask="99"
+                          maskChar=""
                           type="text"
                           id="expiresYear"
                           name="expiresYear"
-                          value={form.values.cardExpirationYear}
+                          value={form.values.expiresYear}
                           onChange={form.handleChange}
                           onBlur={form.handleBlur}
                           className={
@@ -379,7 +395,9 @@ const Checkout = () => {
                       </InputGroup>
                       <InputGroup maxWidth="48px">
                         <label htmlFor="cardCode">CVV</label>
-                        <input
+                        <InputMask
+                          mask="999"
+                          maskChar=""
                           type="text"
                           id="cardCode"
                           name="cardCode"
@@ -406,7 +424,10 @@ const Checkout = () => {
                           }
                         >
                           {installments.map((installment) => (
-                            <option key={installment.quantity} value="">
+                            <option
+                              key={installment.quantity}
+                              value={installment.quantity}
+                            >
                               {installment.quantity}x de{' '}
                               {installment.formattedAmount}
                             </option>
@@ -432,8 +453,9 @@ const Checkout = () => {
             onClick={form.handleSubmit}
             type="submit"
             title="Clique aqui para finalizar a compra"
+            disabled={isLoading}
           >
-            Finalizar compra
+            {isLoading ? 'Finalizando compra...' : 'Finalizar compra'}
           </Button>
         </form>
       )}

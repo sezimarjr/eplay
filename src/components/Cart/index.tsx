@@ -1,5 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { close, remove } from '../../store/reducers/cart'
+import { RootReducer } from '../../store'
+import { useNavigate } from 'react-router-dom'
 import Button from '../Button'
 import { formataPreco } from '../ProductsList'
 import {
@@ -12,11 +14,11 @@ import {
 } from './styles'
 
 import Tag from '../Tag'
-
-import { RootReducer } from '../../store'
+import { getTotalPrice } from '../../utils'
 
 const Cart = () => {
   const { isOpen, items } = useSelector((state: RootReducer) => state.cart)
+  const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const closeCart = () => {
@@ -27,8 +29,9 @@ const Cart = () => {
     dispatch(remove(id))
   }
 
-  const getTotalPrice = () => {
-    return items.reduce((acc, item) => acc + item.prices.current!, 0)
+  const goToCheckout = () => {
+    navigate('/checkout')
+    closeCart()
   }
   return (
     <CartContainer className={isOpen ? 'is-open' : ''}>
@@ -50,10 +53,14 @@ const Cart = () => {
         </ul>
         <Quantity>{items.length} jogos no carrinho</Quantity>
         <Prices>
-          Total de {formataPreco(getTotalPrice())} <br />
+          Total de {formataPreco(getTotalPrice(items))} <br />
           <span>em até 6x sem juros</span>
         </Prices>
-        <Button title="Clique aqui para continuar compra" type="button">
+        <Button
+          onClick={goToCheckout}
+          title="Clique aqui para continuar compra"
+          type="button"
+        >
           Continuar com a compra
         </Button>
       </SideBar>
